@@ -1,37 +1,24 @@
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // TLS
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const emailjs = require("@emailjs/nodejs");
 
 const sendOtpEmail = async (email, otp) => {
   try {
-    await transporter.verify();
+    const response = await emailjs.send(
+      process.env.EMAILJS_SERVICE_ID,
+      process.env.EMAILJS_TEMPLATE_ID,
+      {
+        to_email: email,
+        otp: otp,
+      },
+      {
+        publicKey: process.env.EMAILJS_PUBLIC_KEY,
+        privateKey: process.env.EMAILJS_PRIVATE_KEY,
+      }
+    );
 
-    console.log("SMTP Connected Successfully");
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP Code",
-      html: `
-        <h2>OTP Verification</h2>
-        <p>Your OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This OTP will expire in 5 minutes.</p>
-      `,
-    });
-
-    console.log("OTP Email Sent Successfully");
+    console.log("OTP Email Sent Successfully:", response.status);
 
   } catch (error) {
-    console.log("SMTP Error:", error);
+    console.log("EmailJS Error:", error);
     throw error;
   }
 };
