@@ -20,144 +20,62 @@ const Contact = require("../models/Contact");
 
 
 // ================= REGISTER (WITH OTP) =================
-// router.post("/register", async (req, res) => {
-//   try {
-//     const { full_name, email, password } = req.body;
-
-//     // validation
-//     if (!full_name || !email || !password) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "All fields are required"
-//       });
-//     }
-
-//     // check existing user
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "User already exists"
-//       });
-//     }
-
-//     // hash password
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // generate OTP
-//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-//     // save user with OTP
-//     const newUser = new User({
-//       full_name,
-//       email,
-//       password: hashedPassword,
-//       otp,
-//       otpExpires: Date.now() + 5 * 60 * 1000, // 5 minutes
-//       isVerified: false
-//     });
-
-//     await newUser.save();
-
-//     // send OTP email
-//     // await sendOtpEmail(email, otp);
-
-//     return res.status(201).json({
-//       success: true,
-//       message: "OTP sent to email"
-//     });
-
-//   } catch (error) {
-//     console.log("REGISTER ERROR:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// });
 router.post("/register", async (req, res) => {
-    try {
+  try {
+    const { full_name, email, password } = req.body;
 
-        const { full_name, email, password } = req.body;
-
-        if (!full_name || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "All fields are required"
-            });
-        }
-
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: "User already exists"
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const otp = Math.floor(
-            100000 + Math.random() * 900000
-        ).toString();
-
-        const newUser = new User({
-            full_name,
-            email,
-            password: hashedPassword,
-            otp,
-            otpExpires: Date.now() + 5 * 60 * 1000,
-            isVerified: false,
-        });
-
-        await newUser.save();
-
-        console.log("User saved.");
-
-        console.log("EMAIL_USER:", process.env.EMAIL_USER);
-        console.log(
-            "EMAIL_PASS Exists:",
-            !!process.env.EMAIL_PASS
-        );
-
-        try {
-
-            await sendOtpEmail(email, otp);
-
-            console.log("OTP Email Sent Successfully");
-
-        } catch (emailError) {
-
-            console.error(
-                "SEND OTP ERROR:",
-                emailError
-            );
-
-            return res.status(500).json({
-                success: false,
-                message: "Failed to send OTP email",
-                error: emailError.message,
-            });
-
-        }
-
-        return res.status(201).json({
-            success: true,
-            message: "OTP sent successfully",
-        });
-
-    } catch (error) {
-
-        console.error("REGISTER ERROR:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
-
+    // validation
+    if (!full_name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
     }
+
+    // check existing user
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists"
+      });
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // save user with OTP
+    const newUser = new User({
+      full_name,
+      email,
+      password: hashedPassword,
+      otp,
+      otpExpires: Date.now() + 5 * 60 * 1000, // 5 minutes
+      isVerified: false
+    });
+
+    await newUser.save();
+
+    // send OTP email
+    // await sendOtpEmail(email, otp);
+
+    return res.status(201).json({
+      success: true,
+      message: "OTP sent to email"
+    });
+
+  } catch (error) {
+    console.log("REGISTER ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 });
+
 // ================= GET USER BY ID (NEW FIX) =================
 router.get("/user/:id", verifyToken, async (req, res) => {
   try {
