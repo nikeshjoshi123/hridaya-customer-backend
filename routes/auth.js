@@ -60,7 +60,7 @@ router.post("/register", async (req, res) => {
     await newUser.save();
 
     // send OTP email
-    // await sendOtpEmail(email, otp);
+    await sendOtpEmail(email, otp);
 
     return res.status(201).json({
       success: true,
